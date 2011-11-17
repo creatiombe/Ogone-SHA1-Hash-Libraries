@@ -58,10 +58,7 @@ class OgoneSHA1In {
 		'HEIGHTFRAME', 'HOMEURL', 'HTTP_ACCEPT', 'HTTP_USER_AGENT',
 		'INCLUDE_BIN', 'INCLUDE_COUNTRIES', 'INVDATE', 'INVDISCOUNT',
 		'INVLEVEL', 'INVORDERID', 'ISSUERID', 'IST_MOBILE', 'ITEM_COUNT',
-		'ITEMATTRIBUTES', 'ITEMCATEGORY', 'ITEMCOMMENTS', 'ITEMDESC',
-		'ITEMDISCOUNT', 'ITEMID', 'ITEMNAME', 'ITEMPRICE', 'ITEMQUANT',
-		'ITEMQUANTORIG', 'ITEMUNITOFMEASURE', 'ITEMVAT', 'ITEMVATCODE',
-		'ITEMWEIGHT', 'LANGUAGE', 'LEVEL1AUTHCPC', 'LIDEXCL',
+		'LANGUAGE', 'LEVEL1AUTHCPC', 'LIDEXCL',
 		'LIMITCLIENTSCRIPTUSAGE', 'LINE_REF', 'LINE_REF1', 'LINE_REF2',
 		'LINE_REF3', 'LINE_REF4', 'LINE_REF5', 'LINE_REF6', 'LIST_BIN',
 		'LIST_COUNTRIES', 'LOGO', 'MAXITEMQUANT', 'MERCHANTID', 'MODE',
@@ -86,6 +83,17 @@ class OgoneSHA1In {
 		'UCAF_PAYMENT_CARD_EXPDATE_MONTH', 'UCAF_PAYMENT_CARD_EXPDATE_YEAR',
 		'UCAF_PAYMENT_CARD_NUMBER', 'USERID', 'USERTYPE', 'VERSION',
 		'WBTU_MSISDN', 'WBTU_ORDERID', 'WEIGHTUNIT', 'WIN3DS', 'WITHROO'
+	);
+	
+	/**
+	 * List of fields that are incremental
+	 * @var Array
+	 */
+	protected $_incrementalAllowedFields = array(
+		'ITEMATTRIBUTES', 'ITEMCATEGORY', 'ITEMCOMMENTS', 'ITEMDESC',
+		'ITEMDISCOUNT', 'ITEMID', 'ITEMNAME', 'ITEMPRICE', 'ITEMQUANT',
+		'ITEMQUANTORIG', 'ITEMUNITOFMEASURE', 'ITEMVAT', 'ITEMVATCODE',
+		'ITEMWEIGHT'
 	);
 	
 	/**
@@ -114,14 +122,28 @@ class OgoneSHA1In {
 		$key = strtoupper(trim($key));
 		$val = trim($val);
 		
-		// Check if the field is needed
-		if (!in_array($key, $this->_allowedFields)) return;
-		
 		// Skip if the field is empty
 		if (empty($val)) return;
 		
-		// Eventually add the field
-		$this->_fields[$key] = $val;
+		// Remove the dot from the amount
+		if ($key == 'AMOUNT') {
+			$val = str_replace('.', '', $val);
+		}
+		
+		// Check if the field is needed
+		if (in_array($key, $this->_allowedFields)) {
+
+			$this->_fields[$key] = $val;
+			return false;
+		}
+		
+		// Check if the field is incremental otherwise
+		$numberlessKey = preg_replace('/\d/', '', $key);
+		if (in_array($numberlessKey, $this->_incrementalAllowedFields)) {
+			
+			$this->_fields[$key] = $val;
+			return false;
+		}
 	}
 	
 	/**
