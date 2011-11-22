@@ -205,7 +205,7 @@ class OgoneSHA1In {
 			// Add the key:value pair
 			$string .= sprintf('%s=%s%s', $key, $val, $this->getHash());
 		}
-		
+		//echo '<pre>'; var_dump($this->_fields); exit;
 		// SHA1 hash the string and return it
 		return sha1($string);
 	}
