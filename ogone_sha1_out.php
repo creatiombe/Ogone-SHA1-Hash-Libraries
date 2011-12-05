@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Ogone SHA1 In
+ * Ogone SHA1 Out
  * 
  * Simple library to add key:value pairs of fields
  * used in the communication with Ogone.
@@ -59,11 +59,6 @@ class OgoneSHA1Out {
 		
 		// Skip if the field is empty
 		if (empty($val)) return;
-		
-		// Remove the dot from the amount
-		/*if ($key == 'AMOUNT') {
-			$val = str_replace('.', '', $val);
-		}*/
 		
 		// Check if the field is needed
 		if (in_array($key, $this->_allowedFields)) {
@@ -132,7 +127,7 @@ class OgoneSHA1Out {
 			// Add the key:value pair
 			$string .= sprintf('%s=%s%s', $key, $val, $this->getHash());
 		}
-		//echo '<pre>'; var_dump($this->_fields); exit;
+		
 		// SHA1 hash the string and return it
 		return strtoupper(sha1($string));
 	}
